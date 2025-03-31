@@ -1,93 +1,75 @@
 # Unity Singleton Pattern 
 
-This project is designed to be an **example** of the **Singleton Pattern** in Unity using C#. It demonstrates how to implement a global and single instance of the `GameManager` class to handle game-wide variables such as score.
+This project is designed to be an **example** of the **Singleton Pattern** in Unity using C#. 
 
 ## Features
+- Save player information to a persistent JSON file
+- Load player information from the JSON file
+- Clear saved data
+- User-friendly UI integration
+- Singleton pattern for save manager
 
-- Singleton-based `GameManager` class
-- Global access to the `GameManager` instance
-- Simple score system
-- `Enemy` class interacting with the `GameManager`
+## Structure
 
-## Scripts
-
-- GameManager.cs
-- Enemy.cs
-
-## Explanation
-
-### Singleton Pattern
-
-The `GameManager` class is implemented as a singleton, meaning there will only be **one instance** of it throughout the game's lifetime. This is useful for managing global game states like score, player health, level progression, and more.
-
-## GameManager.cs
+### 1. PlayerData.cs
+Stores player-related data.
 
 ```csharp
-public class GameManager
+[Serializable]
+public class PlayerData
 {
-    private static GameManager instance;
-    private int score = 0;
+    public string playerName;
+    public int playerAge;
+    public string favoriteColor;
 
-    private GameManager() { }
-
-    public static GameManager Instance
+    public PlayerData(string name, int age, string color)
     {
-        get
-        {
-            if (instance == null)
-            {
-                instance = new GameManager();
-            }
-            return instance;
-        }
-    }
-
-    public void IncreaseScore(int amount)
-    {
-        score += amount;
-        Debug.Log("Score: " + score);
+        playerName = name;
+        playerAge = age;
+        favoriteColor = color;
     }
 }
 ```
 
-## Enemy.cs
-```csharp
-public class Enemy : MonoBehaviour
-{
-    public GameObject enemy;
+### 2. PlayerFormUI.cs
+Handles user input and UI interaction.
 
-    public void Death()
-    {
-        GameManager gameManager = GameManager.Instance;
-        Destroy(enemy);
-        gameManager.IncreaseScore(10);
-    }
-}
-```
+- Input Fields:
+    - Name (string)
+    - Age (int)
+    - Favorite Color (string)
 
-## How It Works
+- Buttons:
+    - Save: Saves entered data
+    - Load: Loads saved data into input fields
+    - Clear: Deletes saved data and clears input fields
 
-- `GameManager.Instance` ensures that there is only one instance of `GameManager`.
-- When an enemy dies, it calls `IncreaseScore()` on the singleton instance and increases the score by 10.
-- The score is globally managed and can be accessed from anywhere via `GameManager.Instance`.
+### 3. SaveManager.cs
+Manages the save/load/clear logic using JSON serialization.
 
-## Why Singleton?
+- Singleton pattern to ensure a single instance
+- Automatically sets the save path using `Application.persistentDataPath`
+- Provides the following methods:
+    - `Save(PlayerData data)`
+    - `Load()`
+    - `ClearSave()`
 
-The singleton pattern is widely used for:
-
-- Game Managers
-- Audio Managers
-- UI Managers
-- Score Managers
-- Configurations
-
-It prevents creating multiple instances of critical managers accidentally.
+## Example Usage
+1. Attach `PlayerFormUI` to a Canvas GameObject in your Unity scene.
+2. Link UI elements (input fields and buttons) via the Inspector.
+3. Play the scene.
+4. Enter data and click **Save**.
+5. Exit Play Mode and re-enter to test **Load**.
+6. Click **Clear** to delete saved data.
 
 ## Notes
+- Data is saved in JSON format inside the persistent data path.
+- Input validation is included for empty fields and age conversion.
+- `SaveManager` is fully independent and does not require a MonoBehaviour.
 
-> This is a simplified example. In real Unity projects, it is common to make singleton managers inherit from `MonoBehaviour` when they need access to Unity's lifecycle methods (`Start()`, `Update()`, etc.).
+---
 
-## License
+> This project demonstrates basic Unity data persistence using JSON and Singleton pattern.
+> Easily extendable for larger projects.
 
-This project is open-source and free to use.
 
